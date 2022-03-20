@@ -1,0 +1,161 @@
+{
+	"info": {
+		"_postman_id": "76feddc9-fc7b-4c50-b3a3-cde213fb1c77",
+		"name": "rebels-api",
+		"description": "# Star Wars Resistance Social Network",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "GET /rebels",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/rebels",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"rebels"
+					]
+				},
+				"description": "Get a **list** of all the registered rebels, where a rebel has the following, simplified schema:\n\n``` json\n{\n  \"id\": 1,\n  \"name\": \"John Smith\",\n  \"age\": 30,\n  \"gender\": \"MALE\",\n  \"location\": {\n    \"name\": \"Venus\",\n    \"latitude\": 50,\n    \"longitude\": 57\n  },\n  \"inventory\": {\n    \"weapons\": 1,\n    \"ammo\": 2,\n    \"water\": 3,\n    \"food\": 4\n  }\n}\n\n```"
+			},
+			"response": []
+		},
+		{
+			"name": "POST /rebels",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"John Smith\",\n    \"age\": 30,\n    \"gender\": \"MALE\",\n    \"location\": {\n        \"name\": \"Venus\",\n        \"latitude\": 50,\n        \"longitude\": 57\n    },\n    \"inventory\": {\n        \"weapons\": 10,\n        \"ammo\": 10,\n        \"water\": 10,\n        \"food\": 10\n    }\n}"
+				},
+				"url": {
+					"raw": "localhost:8080/rebels",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"rebels"
+					]
+				},
+				"description": "Post a new rebel. Request body must respect the example presented below, where:\n\n*   `\"gender\"` must be either \"`MALE\"`, `\"FEMALE\"` or `\"OTHER\"`;\n*   `\"latitude\"` and `\"longitude\"` must be an integer number between 0 and 90 degrees;\n    \n\nand the other fields are self explanatory."
+			},
+			"response": []
+		},
+		{
+			"name": "PUT /rebels/{id}/location",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"Earth\",\n    \"latitude\": 80,\n    \"longitude\": 78 \n}"
+				},
+				"url": {
+					"raw": "localhost:8080/rebels/1/location",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"rebels",
+						"1",
+						"location"
+					]
+				},
+				"description": "Update a rebel location. Request body must respect the suplied example below."
+			},
+			"response": []
+		},
+		{
+			"name": "PUT /rebels/{id}/treasons",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/rebels/1/treasons",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"rebels",
+						"1",
+						"treasons"
+					]
+				},
+				"description": "Report the rebel with `id` equal to `{id}` as a traitor. Each report increases the `rebel.treasons` property and, once it reaches 3, the given rebel is permanently marked as a traitor."
+			},
+			"response": []
+		},
+		{
+			"name": "POST /rebels/{id}/trade/{otheId}",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"request\": {\n        \"weapons\": 0,\n        \"ammo\": 0,\n        \"water\": 0,\n        \"food\": 2\n    },\n    \"offer\": {\n        \"weapons\": 0,\n        \"ammo\": 0,\n        \"water\": 1,\n        \"food\": 0\n    }\n}"
+				},
+				"url": {
+					"raw": "localhost:8080/rebels/1/trade/2",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"rebels",
+						"1",
+						"trade",
+						"2"
+					]
+				},
+				"description": "Performs a trade o items between two rebels. The one with `id={id}` is the requesting party and the one with `id={otherId}` is the offering party. Request body must respect the suplied example below."
+			},
+			"response": []
+		},
+		{
+			"name": "GET /reports",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/reports",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"reports"
+					]
+				},
+				"description": "Return a report with statistical information about the registered rebels and traitors. Response body respect the following, simplified, schema:\n\n``` json\n{\n    \"traitorsPercentage\": 0.5,\n    \"rebelsPercentage\": 0.5,\n    \"rebelsAverageInventory\": {\n        \"weapons\": 10.0,\n        \"ammo\": 10.0,\n        \"water\": 10.0,\n        \"food\": 10.0\n    },\n    \"traitorsLostPoints\": 100\n}\n\n```"
+			},
+			"response": []
+		}
+	]
+}
