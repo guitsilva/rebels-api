@@ -19,6 +19,7 @@ public class ReportController {
         this.reportService = reportService;
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping()
     public ReportDTO generateReport() {
         return this.reportService.generateReport();

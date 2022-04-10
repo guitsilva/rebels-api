@@ -7,10 +7,48 @@
 	},
 	"item": [
 		{
+			"name": "POST /auth/login",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"admin\",\n    \"password\": \"admin\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/auth/login",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"auth",
+						"login"
+					]
+				},
+				"description": "Post credentials of an existing user (see example below) to get a JWT for subsequent authentication and authorization. The JWT expires in 1 hour."
+			},
+			"response": []
+		},
+		{
 			"name": "GET /rebels",
 			"request": {
+				"auth": {
+					"type": "noauth"
+				},
 				"method": "GET",
-				"header": [],
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{admin_token}}",
+						"type": "text"
+					}
+				],
 				"url": {
 					"raw": "localhost:8080/rebels",
 					"host": [
@@ -28,17 +66,25 @@
 		{
 			"name": "POST /rebels",
 			"request": {
+				"auth": {
+					"type": "noauth"
+				},
 				"method": "POST",
 				"header": [
 					{
 						"key": "Content-Type",
 						"value": "application/json",
 						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{admin_token}}",
+						"type": "text"
 					}
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"name\": \"John Smith\",\n    \"age\": 30,\n    \"gender\": \"MALE\",\n    \"location\": {\n        \"name\": \"Venus\",\n        \"latitude\": 50,\n        \"longitude\": 57\n    },\n    \"inventory\": {\n        \"weapons\": 10,\n        \"ammo\": 10,\n        \"water\": 10,\n        \"food\": 10\n    }\n}"
+					"raw": "{\n    \"name\": \"John Smith\",\n    \"password\": \"jsmith\",\n    \"age\": 30,\n    \"gender\": \"MALE\",\n    \"location\": {\n        \"name\": \"Venus\",\n        \"latitude\": 50,\n        \"longitude\": 57\n    },\n    \"inventory\": {\n        \"weapons\": 10,\n        \"ammo\": 10,\n        \"water\": 10,\n        \"food\": 10\n    }\n}"
 				},
 				"url": {
 					"raw": "localhost:8080/rebels",
@@ -55,13 +101,65 @@
 			"response": []
 		},
 		{
+			"name": "DELETE /rebels/{id}",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{admin_token}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "localhost:8080/rebels/2",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"rebels",
+						"2"
+					]
+				},
+				"description": "Delete the rebel whose `id` equals `{id}`."
+			},
+			"response": []
+		},
+		{
+			"name": "GET /rebels/{id}/inventory",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{admin_token}}",
+						"type": "text"
+					}
+				],
+				"description": "Get the `inventory` and `name` of the rebel with `id` equal to `{id}`. Response body respects the following simplified schema:\n\n``` json\n{\n  \"name\": \"John Smith\",\n  \"inventory\": {\n    \"weapons\": 1,\n    \"ammo\": 2,\n    \"water\": 3,\n    \"food\": 4\n  }\n}\n\n```"
+			},
+			"response": []
+		},
+		{
 			"name": "PUT /rebels/{id}/location",
 			"request": {
+				"auth": {
+					"type": "noauth"
+				},
 				"method": "PUT",
 				"header": [
 					{
 						"key": "Content-Type",
 						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{admin_token}} | {{rebel_token}}",
 						"type": "text"
 					}
 				],
@@ -70,14 +168,14 @@
 					"raw": "{\n    \"name\": \"Earth\",\n    \"latitude\": 80,\n    \"longitude\": 78 \n}"
 				},
 				"url": {
-					"raw": "localhost:8080/rebels/1/location",
+					"raw": "localhost:8080/rebels/2/location",
 					"host": [
 						"localhost"
 					],
 					"port": "8080",
 					"path": [
 						"rebels",
-						"1",
+						"2",
 						"location"
 					]
 				},
@@ -88,17 +186,26 @@
 		{
 			"name": "PUT /rebels/{id}/treasons",
 			"request": {
+				"auth": {
+					"type": "noauth"
+				},
 				"method": "PUT",
-				"header": [],
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{rebel_token}}",
+						"type": "text"
+					}
+				],
 				"url": {
-					"raw": "localhost:8080/rebels/1/treasons",
+					"raw": "localhost:8080/rebels/2/treasons",
 					"host": [
 						"localhost"
 					],
 					"port": "8080",
 					"path": [
 						"rebels",
-						"1",
+						"2",
 						"treasons"
 					]
 				},
@@ -109,11 +216,19 @@
 		{
 			"name": "POST /rebels/{id}/trade/{otheId}",
 			"request": {
+				"auth": {
+					"type": "noauth"
+				},
 				"method": "POST",
 				"header": [
 					{
 						"key": "Content-Type",
 						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{rebel_token}}",
 						"type": "text"
 					}
 				],
@@ -122,16 +237,16 @@
 					"raw": "{\n    \"request\": {\n        \"weapons\": 0,\n        \"ammo\": 0,\n        \"water\": 0,\n        \"food\": 2\n    },\n    \"offer\": {\n        \"weapons\": 0,\n        \"ammo\": 0,\n        \"water\": 1,\n        \"food\": 0\n    }\n}"
 				},
 				"url": {
-					"raw": "localhost:8080/rebels/1/trade/2",
+					"raw": "localhost:8080/rebels/2/trade/3",
 					"host": [
 						"localhost"
 					],
 					"port": "8080",
 					"path": [
 						"rebels",
-						"1",
+						"2",
 						"trade",
-						"2"
+						"3"
 					]
 				},
 				"description": "Performs a trade o items between two rebels. The one with `id={id}` is the requesting party and the one with `id={otherId}` is the offering party. Request body must respect the suplied example below."
@@ -141,8 +256,17 @@
 		{
 			"name": "GET /reports",
 			"request": {
+				"auth": {
+					"type": "noauth"
+				},
 				"method": "GET",
-				"header": [],
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{admin_token}}",
+						"type": "text"
+					}
+				],
 				"url": {
 					"raw": "localhost:8080/reports",
 					"host": [

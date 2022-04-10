@@ -5,7 +5,6 @@ import com.github.guitsilva.rebelsapi.domain.dtos.ReportDTO;
 import com.github.guitsilva.rebelsapi.entities.Rebel;
 import com.github.guitsilva.rebelsapi.repositories.RebelRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,7 +19,6 @@ public class ReportService {
         this.rebelRepository = rebelRepository;
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
     public ReportDTO generateReport() {
         return ReportDTO.builder()
                 .traitorsPercentage(this.getTraitorsPercentage())

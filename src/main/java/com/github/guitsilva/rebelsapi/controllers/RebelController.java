@@ -1,8 +1,6 @@
 package com.github.guitsilva.rebelsapi.controllers;
 
-import com.github.guitsilva.rebelsapi.domain.dtos.LocationDTO;
-import com.github.guitsilva.rebelsapi.domain.dtos.RebelDTO;
-import com.github.guitsilva.rebelsapi.domain.dtos.TradeDTO;
+import com.github.guitsilva.rebelsapi.domain.dtos.*;
 import com.github.guitsilva.rebelsapi.entities.Rebel;
 import com.github.guitsilva.rebelsapi.services.RebelService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,12 +24,14 @@ public class RebelController {
         this.rebelService = rebelService;
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping()
     public ResponseEntity<Page<Rebel>> findAll(Pageable pageable) {
         Page<Rebel> rebels = this.rebelService.findAll(pageable);
         return new ResponseEntity<>(rebels, HttpStatus.OK);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping()
     public ResponseEntity<Rebel> save(
             @Valid @RequestBody RebelDTO rebelDTO
@@ -40,23 +40,44 @@ public class RebelController {
         return new ResponseEntity<>(savedRebel, HttpStatus.CREATED);
     }
 
-    @PutMapping("/{id}/location")
-    public ResponseEntity<Void> updateLocation(
-            @PathVariable Long id,
-            @Valid @RequestBody LocationDTO newLocationDTO
+    @PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteById(
+            @PathVariable Long id
     ) {
-        this.rebelService.updateLocation(id, newLocationDTO);
+        this.rebelService.deleteById(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/{id}/inventory")
+    public ResponseEntity<NameInventoryDTO> findInventoryById(
+            @PathVariable Long id
+    ) {
+        NameInventoryDTO nameInventoryDTO = this.rebelService.findInventoryById(id);
+        return new ResponseEntity<>(nameInventoryDTO, HttpStatus.OK);
+    }
+
+    @PreAuthorize("hasAnyRole('ADMIN', 'REBEL')")
+    @PutMapping("/{id}/location")
+    public ResponseEntity<Void> updateLocationById(
+            @PathVariable Long id,
+            @Valid @RequestBody LocationDTO newLocationDTO
+    ) {
+        this.rebelService.updateLocationById(id, newLocationDTO);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PreAuthorize("hasRole('REBEL')")
     @PutMapping("/{id}/treasons")
     public ResponseEntity<Void> reportTreason(
             @PathVariable Long id
     ) {
-        this.rebelService.reportTreason(id);
+        this.rebelService.reportTreasonById(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    @PreAuthorize("hasRole('REBEL')")
     @PostMapping("/{id}/trade/{otherRebelId}")
     public ResponseEntity<Void> trade(
             @PathVariable Long id,

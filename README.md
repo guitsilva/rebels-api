@@ -2,13 +2,13 @@
 
 ## Description
 
-Spring Boot powered API to manage the Resistance members items. Please see the project [statement](https://github.com/guitsilva/rebels-api/blob/main/docs/statement.pdf) (pt-BR) for details.
+Spring Boot powered API to manage the Resistance members items. Please see the project [statement01](https://github.com/guitsilva/rebels-api/blob/main/docs/statement01.pdf) and [statement02](https://github.com/guitsilva/rebels-api/blob/main/docs/statement02.pdf) (pt-BR) for details.
 
 ## How-To
 
 ### Requirements
 
-- JDK v17
+- JDK v18
 - Maven v3
 
 ### Installation

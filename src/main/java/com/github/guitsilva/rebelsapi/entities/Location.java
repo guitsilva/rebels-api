@@ -29,6 +29,9 @@ public class Location {
     @Column
     private Integer longitude;
 
+    @Column(columnDefinition = "boolean default true")
+    private boolean updatedByAdmin = true;
+
     @JsonIgnore
     @OneToMany
     private List<Rebel> rebels;

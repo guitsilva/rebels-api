@@ -1,12 +1,10 @@
 package com.github.guitsilva.rebelsapi.services;
 
 import com.github.guitsilva.rebelsapi.domain.Role;
-import com.github.guitsilva.rebelsapi.domain.dtos.InventoryDTO;
-import com.github.guitsilva.rebelsapi.domain.dtos.LocationDTO;
-import com.github.guitsilva.rebelsapi.domain.dtos.RebelDTO;
-import com.github.guitsilva.rebelsapi.domain.dtos.TradeDTO;
+import com.github.guitsilva.rebelsapi.domain.dtos.*;
 import com.github.guitsilva.rebelsapi.domain.mappers.MapStructMapper;
 import com.github.guitsilva.rebelsapi.entities.Inventory;
+import com.github.guitsilva.rebelsapi.entities.Location;
 import com.github.guitsilva.rebelsapi.entities.Rebel;
 import com.github.guitsilva.rebelsapi.exceptions.InvalidTradeException;
 import com.github.guitsilva.rebelsapi.exceptions.RebelNotFoundException;
@@ -15,7 +13,8 @@ import com.github.guitsilva.rebelsapi.repositories.RebelRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -41,12 +40,10 @@ public class RebelService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
     public Page<Rebel> findAll(Pageable pageable) {
         return this.rebelRepository.findAll(pageable);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
     public Rebel save(RebelDTO rebelDTO) {
         Optional<Rebel> optionalSameNameRebel = this.rebelRepository.findByName(rebelDTO.getName());
 
@@ -63,19 +60,42 @@ public class RebelService {
         return this.rebelRepository.save(newRebel);
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN', 'REBEL')")
-    public Rebel updateLocation(Long id, LocationDTO newLocationDTO) {
+    public void deleteById(Long id) {
+        if (!this.rebelRepository.existsById(id)) {
+            throw new RebelNotFoundException("rebel with id = " + id + " not found");
+        }
+
+        this.rebelRepository.deleteById(id);
+    }
+
+    public NameInventoryDTO findInventoryById(Long id) {
         Rebel rebel = this.rebelRepository.findById(id).orElseThrow(
                 () -> new RebelNotFoundException("rebel with id = " + id + " not found")
         );
 
-        rebel.setLocation(this.mapStructMapper.locationDTOToLocation(newLocationDTO));
+        InventoryDTO rebelInventoryDTO = this.mapStructMapper.inventoryToInventoryDTO(rebel.getInventory());
+
+        return NameInventoryDTO.builder()
+                .name(rebel.getName())
+                .inventory(rebelInventoryDTO)
+                .build();
+    }
+
+    public Rebel updateLocationById(Long id, LocationDTO newLocationDTO) {
+        Rebel rebel = this.rebelRepository.findById(id).orElseThrow(
+                () -> new RebelNotFoundException("rebel with id = " + id + " not found")
+        );
+
+        Location newLocation = this.mapStructMapper.locationDTOToLocation(newLocationDTO);
+
+        newLocation.setUpdatedByAdmin(this.getAuthentication().getName().equals("admin"));
+
+        rebel.setLocation(newLocation);
 
         return this.rebelRepository.save(rebel);
     }
 
-    @PreAuthorize("hasRole('REBEL')")
-    public Rebel reportTreason(Long id) {
+    public Rebel reportTreasonById(Long id) {
         Rebel rebel = this.rebelRepository.findById(id).orElseThrow(
                 () -> new RebelNotFoundException("rebel with id = " + id + " not found")
         );
@@ -86,7 +106,6 @@ public class RebelService {
         return this.rebelRepository.save(rebel);
     }
 
-    @PreAuthorize("hasRole('REBEL')")
     @Transactional
     public void trade(Long requestingRebelId, Long offeringRebelId, TradeDTO tradeDTO) {
         if (Objects.equals(requestingRebelId, offeringRebelId)) {
@@ -177,5 +196,9 @@ public class RebelService {
         }
 
         return inventory.getFood() >= 0;
+    }
+
+    private Authentication getAuthentication() {
+        return SecurityContextHolder.getContext().getAuthentication();
     }
 }
