@@ -10,7 +10,7 @@ Spring Boot powered API to manage the Resistance members items. Please see the p
 
 - JDK v18
 - Maven v3
-- Postgres v14 (see the `application.properties` file for details)
+- **Postgres v14 (see the `application.properties` file for details)**
 
 ### Installation
 
@@ -19,9 +19,11 @@ Spring Boot powered API to manage the Resistance members items. Please see the p
     
     $ cd rebels-api
     
+    $ git switch feature/auth
+    
     $ ./mvnw install
     
-    $ java -jar target/rebels-api-1.0.0.jar
+    $ java -jar target/rebels-api-1.1.0.jar
 ```
 
 ## Documentation
