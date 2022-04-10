@@ -5,10 +5,10 @@ import com.github.guitsilva.rebelsapi.domain.dtos.ReportDTO;
 import com.github.guitsilva.rebelsapi.entities.Rebel;
 import com.github.guitsilva.rebelsapi.repositories.RebelRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class ReportService {
@@ -20,6 +20,7 @@ public class ReportService {
         this.rebelRepository = rebelRepository;
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     public ReportDTO generateReport() {
         return ReportDTO.builder()
                 .traitorsPercentage(this.getTraitorsPercentage())
@@ -36,66 +37,61 @@ public class ReportService {
             return 0d;
         }
 
-        long traitorsCount = this.rebelRepository.findAll().stream().filter(
-                (rebel) -> rebel.getTreasons() >= 3
-        ).count();
+        long traitorsCount = this.rebelRepository.findAllTraitors().size();
 
         return (double) traitorsCount / rebelsCount;
     }
 
     private AvgInventoryDTO getRebelsAverageInventory() {
-        List<Rebel> rebels = this.rebelRepository.findAll().stream()
-                .filter((rebel) -> rebel.getTreasons() < 3)
-                .collect(Collectors.toList());
+        List<Rebel> nonTraitors = this.rebelRepository.findAllNonTraitors();
 
-        long rebelsCount = rebels.size();
+        long nonTraitorsCount = nonTraitors.size();
 
-        if (rebelsCount == 0) {
+        if (nonTraitorsCount == 0) {
             return AvgInventoryDTO.builder()
                     .weapons(0d).ammo(0d).water(0d).food(0d)
                     .build();
         }
 
-        long weaponsCount = rebels.stream()
+        long weaponsCount = nonTraitors.stream()
                 .reduce(0L,
                         (sum, rebel) -> sum + rebel.getInventory().getWeapons(),
                         Long::sum
                 );
 
-        long ammoCount = rebels.stream()
+        long ammoCount = nonTraitors.stream()
                 .reduce(0L,
                         (sum, rebel) -> sum + rebel.getInventory().getAmmo(),
                         Long::sum
                 );
 
-        long waterCount = rebels.stream()
+        long waterCount = nonTraitors.stream()
                 .reduce(0L,
                         (sum, rebel) -> sum + rebel.getInventory().getWater(),
                         Long::sum
                 );
 
-        long foodCount = rebels.stream()
+        long foodCount = nonTraitors.stream()
                 .reduce(0L,
                         (sum, rebel) -> sum + rebel.getInventory().getFood(),
                         Long::sum
                 );
 
         return AvgInventoryDTO.builder()
-                .weapons((double) weaponsCount / rebelsCount)
-                .ammo((double) ammoCount / rebelsCount)
-                .water((double) waterCount / rebelsCount)
-                .food((double) foodCount / rebelsCount)
+                .weapons((double) weaponsCount / nonTraitorsCount)
+                .ammo((double) ammoCount / nonTraitorsCount)
+                .water((double) waterCount / nonTraitorsCount)
+                .food((double) foodCount / nonTraitorsCount)
                 .build();
     }
 
     private long getTraitorsLostPoints() {
-        return this.rebelRepository.findAll().stream()
-                .filter((rebel) -> rebel.getTreasons() >= 3)
+        return this.rebelRepository.findAllTraitors().stream()
                 .reduce(0L, (sum, traitor) -> sum +
-                        (traitor.getInventory().getWeapons() * 4L) +
-                        (traitor.getInventory().getAmmo() * 3L) +
-                        (traitor.getInventory().getWater() * 2L) +
-                        traitor.getInventory().getFood(),
+                                (traitor.getInventory().getWeapons() * 4L) +
+                                (traitor.getInventory().getAmmo() * 3L) +
+                                (traitor.getInventory().getWater() * 2L) +
+                                traitor.getInventory().getFood(),
                         Long::sum);
     }
 }

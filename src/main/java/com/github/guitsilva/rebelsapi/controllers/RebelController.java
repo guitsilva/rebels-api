@@ -6,12 +6,14 @@ import com.github.guitsilva.rebelsapi.domain.dtos.TradeDTO;
 import com.github.guitsilva.rebelsapi.entities.Rebel;
 import com.github.guitsilva.rebelsapi.services.RebelService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.List;
 
 @RestController
 @RequestMapping("/rebels")
@@ -25,8 +27,8 @@ public class RebelController {
     }
 
     @GetMapping()
-    public ResponseEntity<List<Rebel>> findAll() {
-        List<Rebel> rebels = this.rebelService.findAll();
+    public ResponseEntity<Page<Rebel>> findAll(Pageable pageable) {
+        Page<Rebel> rebels = this.rebelService.findAll(pageable);
         return new ResponseEntity<>(rebels, HttpStatus.OK);
     }
 

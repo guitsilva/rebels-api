@@ -17,7 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestControllerAdvice
-public class RequestValidationHandler extends ResponseEntityExceptionHandler{
+public class RequestValidationHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(RebelOverwriteException.class)
     public ResponseEntity<Object> handleRebelNotFound(
@@ -61,7 +61,7 @@ public class RequestValidationHandler extends ResponseEntityExceptionHandler{
     ) {
         Map<String, String> errors = new HashMap<>();
 
-        exception.getBindingResult().getAllErrors().forEach((error) ->{
+        exception.getBindingResult().getAllErrors().forEach((error) -> {
             String fieldName = ((FieldError) error).getField();
             String message = error.getDefaultMessage();
             errors.put(fieldName, message);

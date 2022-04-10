@@ -20,6 +20,9 @@ public class RebelDTO {
     @NotBlank
     private String name;
 
+    @NotBlank
+    private String password;
+
     @NotNull
     @Min(value = 0)
     private Integer age;

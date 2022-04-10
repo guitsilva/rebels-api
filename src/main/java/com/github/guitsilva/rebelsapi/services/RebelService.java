@@ -1,5 +1,6 @@
 package com.github.guitsilva.rebelsapi.services;
 
+import com.github.guitsilva.rebelsapi.domain.Role;
 import com.github.guitsilva.rebelsapi.domain.dtos.InventoryDTO;
 import com.github.guitsilva.rebelsapi.domain.dtos.LocationDTO;
 import com.github.guitsilva.rebelsapi.domain.dtos.RebelDTO;
@@ -12,40 +13,57 @@ import com.github.guitsilva.rebelsapi.exceptions.RebelNotFoundException;
 import com.github.guitsilva.rebelsapi.exceptions.RebelOverwriteException;
 import com.github.guitsilva.rebelsapi.repositories.RebelRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import javax.transaction.Transactional;
 import java.util.Objects;
+import java.util.Optional;
 
 @Service
 public class RebelService {
 
     private final RebelRepository rebelRepository;
     private final MapStructMapper mapStructMapper;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
     public RebelService(
             RebelRepository rebelRepository,
-            MapStructMapper mapStructMapper
+            MapStructMapper mapStructMapper,
+            PasswordEncoder passwordEncoder
     ) {
         this.rebelRepository = rebelRepository;
         this.mapStructMapper = mapStructMapper;
+        this.passwordEncoder = passwordEncoder;
     }
 
-    public List<Rebel> findAll() {
-        return this.rebelRepository.findAll();
+    @PreAuthorize("hasRole('ADMIN')")
+    public Page<Rebel> findAll(Pageable pageable) {
+        return this.rebelRepository.findAll(pageable);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     public Rebel save(RebelDTO rebelDTO) {
-        List<Rebel> sameNameRebels = this.rebelRepository.findByName(rebelDTO.getName());
+        Optional<Rebel> optionalSameNameRebel = this.rebelRepository.findByName(rebelDTO.getName());
 
-        if (!sameNameRebels.isEmpty()) {
+        if (optionalSameNameRebel.isPresent()) {
             throw new RebelOverwriteException("rebel name already taken");
         }
 
-        return this.rebelRepository.save(this.mapStructMapper.rebelDTOToRebel(rebelDTO));
+        String encodedPassword = this.passwordEncoder.encode(rebelDTO.getPassword());
+
+        Rebel newRebel = this.mapStructMapper.rebelDTOToRebel(rebelDTO);
+        newRebel.setPassword(encodedPassword);
+        newRebel.setRole(Role.REBEL);
+
+        return this.rebelRepository.save(newRebel);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'REBEL')")
     public Rebel updateLocation(Long id, LocationDTO newLocationDTO) {
         Rebel rebel = this.rebelRepository.findById(id).orElseThrow(
                 () -> new RebelNotFoundException("rebel with id = " + id + " not found")
@@ -56,6 +74,7 @@ public class RebelService {
         return this.rebelRepository.save(rebel);
     }
 
+    @PreAuthorize("hasRole('REBEL')")
     public Rebel reportTreason(Long id) {
         Rebel rebel = this.rebelRepository.findById(id).orElseThrow(
                 () -> new RebelNotFoundException("rebel with id = " + id + " not found")
@@ -67,6 +86,8 @@ public class RebelService {
         return this.rebelRepository.save(rebel);
     }
 
+    @PreAuthorize("hasRole('REBEL')")
+    @Transactional
     public void trade(Long requestingRebelId, Long offeringRebelId, TradeDTO tradeDTO) {
         if (Objects.equals(requestingRebelId, offeringRebelId)) {
             throw new InvalidTradeException("requesting and offering parties cannot be equal");
@@ -114,13 +135,13 @@ public class RebelService {
         InventoryDTO offer = tradeDTO.getOffer();
 
         int requestPoints =
-                        request.getWeapons() * 4 +
+                request.getWeapons() * 4 +
                         request.getAmmo() * 3 +
                         request.getWater() * 2 +
                         request.getFood();
 
         int offerPoints =
-                        offer.getWeapons() * 4 +
+                offer.getWeapons() * 4 +
                         offer.getAmmo() * 3 +
                         offer.getWater() * 2 +
                         offer.getFood();
@@ -155,10 +176,6 @@ public class RebelService {
             return false;
         }
 
-        if (inventory.getFood() < 0) {
-            return false;
-        }
-
-        return true;
+        return inventory.getFood() >= 0;
     }
 }

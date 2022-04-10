@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Table(name = "locations")
@@ -29,6 +30,6 @@ public class Location {
     private Integer longitude;
 
     @JsonIgnore
-    @ManyToOne
-    private Rebel rebel;
+    @OneToMany
+    private List<Rebel> rebels;
 }

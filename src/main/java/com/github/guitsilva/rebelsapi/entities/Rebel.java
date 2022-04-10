@@ -1,6 +1,9 @@
 package com.github.guitsilva.rebelsapi.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.guitsilva.rebelsapi.domain.Gender;
+import com.github.guitsilva.rebelsapi.domain.Role;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -33,11 +36,20 @@ public class Rebel {
     @Column(columnDefinition = "integer default 0")
     private int treasons;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @Column
+    @Enumerated(EnumType.STRING)
+    @JsonIgnore
+    private Role role;
+
+    @Column
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    private String password;
+
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "location_id", referencedColumnName = "id")
     private Location location;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "inventory_id", referencedColumnName = "id")
     private Inventory inventory;
 }
