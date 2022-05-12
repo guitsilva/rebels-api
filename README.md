@@ -17,8 +17,6 @@ Spring Boot powered API to manage the Resistance members items. Please see the p
     
     $ cd rebels-api
     
-    $ git switch feature/auth
-    
     $ docker-compose up
 ```
 
