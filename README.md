@@ -8,11 +8,9 @@ Spring Boot powered API to manage the Resistance members items. Please see the p
 
 ### Requirements
 
-- JDK v18
-- Maven v3
-- **Postgres v14 (see the `application.properties` file for details)**
+- Docker
 
-### Installation
+### Running
 
 ```shell
     $ git clone https://github.com/guitsilva/rebels-api
@@ -21,9 +19,7 @@ Spring Boot powered API to manage the Resistance members items. Please see the p
     
     $ git switch feature/auth
     
-    $ ./mvnw install
-    
-    $ java -jar target/rebels-api-1.1.0.jar
+    $ docker-compose up
 ```
 
 ## Documentation
