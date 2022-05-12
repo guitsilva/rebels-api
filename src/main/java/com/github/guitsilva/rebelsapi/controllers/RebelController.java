@@ -3,7 +3,7 @@ package com.github.guitsilva.rebelsapi.controllers;
 import com.github.guitsilva.rebelsapi.domain.dtos.*;
 import com.github.guitsilva.rebelsapi.entities.Rebel;
 import com.github.guitsilva.rebelsapi.services.RebelService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -15,14 +15,10 @@ import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/rebels")
+@RequiredArgsConstructor
 public class RebelController {
 
     private final RebelService rebelService;
-
-    @Autowired
-    public RebelController(RebelService rebelService) {
-        this.rebelService = rebelService;
-    }
 
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping()

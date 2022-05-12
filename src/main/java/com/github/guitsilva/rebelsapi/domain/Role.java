@@ -8,7 +8,7 @@ public enum Role implements GrantedAuthority {
 
     private final String authority;
 
-    private Role(String authority) {
+    Role(String authority) {
         this.authority = authority;
     }
 

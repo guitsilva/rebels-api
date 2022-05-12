@@ -3,7 +3,7 @@ package com.github.guitsilva.rebelsapi.security.config;
 import com.github.guitsilva.rebelsapi.security.details.services.RebelDetailsServiceImpl;
 import com.github.guitsilva.rebelsapi.security.filters.JwtAuthenticationFilter;
 import com.github.guitsilva.rebelsapi.security.filters.JwtValidationFilter;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -17,19 +17,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true, proxyTargetClass = true)
+@RequiredArgsConstructor
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final RebelDetailsServiceImpl rebelDetailsService;
     private final PasswordEncoder passwordEncoder;
-
-    @Autowired
-    public WebSecurityConfig(
-            RebelDetailsServiceImpl rebelDetailsService,
-            PasswordEncoder passwordEncoder
-    ) {
-        this.rebelDetailsService = rebelDetailsService;
-        this.passwordEncoder = passwordEncoder;
-    }
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {

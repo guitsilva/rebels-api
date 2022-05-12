@@ -1,6 +1,7 @@
 package com.github.guitsilva.rebelsapi.security.details.data;
 
 import com.github.guitsilva.rebelsapi.entities.Rebel;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -9,13 +10,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+@RequiredArgsConstructor
 public class RebelDataDetails implements UserDetails {
 
     private final Rebel rebel;
-
-    public RebelDataDetails(Rebel rebel) {
-        this.rebel = rebel;
-    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

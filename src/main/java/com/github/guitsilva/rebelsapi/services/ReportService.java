@@ -4,20 +4,16 @@ import com.github.guitsilva.rebelsapi.domain.dtos.AvgInventoryDTO;
 import com.github.guitsilva.rebelsapi.domain.dtos.ReportDTO;
 import com.github.guitsilva.rebelsapi.entities.Rebel;
 import com.github.guitsilva.rebelsapi.repositories.RebelRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class ReportService {
 
     private final RebelRepository rebelRepository;
-
-    @Autowired
-    public ReportService(RebelRepository rebelRepository) {
-        this.rebelRepository = rebelRepository;
-    }
 
     public ReportDTO generateReport() {
         return ReportDTO.builder()

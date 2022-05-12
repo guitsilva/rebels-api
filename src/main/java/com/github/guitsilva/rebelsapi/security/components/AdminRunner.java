@@ -8,28 +8,18 @@ import com.github.guitsilva.rebelsapi.domain.dtos.RebelDTO;
 import com.github.guitsilva.rebelsapi.domain.mappers.MapStructMapper;
 import com.github.guitsilva.rebelsapi.entities.Rebel;
 import com.github.guitsilva.rebelsapi.repositories.RebelRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class AdminRunner implements CommandLineRunner {
 
     private final RebelRepository rebelRepository;
     private final MapStructMapper mapStructMapper;
     private final PasswordEncoder passwordEncoder;
-
-    @Autowired
-    public AdminRunner(
-            RebelRepository rebelRepository,
-            MapStructMapper mapStructMapper,
-            PasswordEncoder passwordEncoder
-    ) {
-        this.rebelRepository = rebelRepository;
-        this.mapStructMapper = mapStructMapper;
-        this.passwordEncoder = passwordEncoder;
-    }
 
     @Override
     public void run(String[] args) {

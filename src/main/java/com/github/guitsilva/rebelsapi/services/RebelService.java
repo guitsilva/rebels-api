@@ -10,7 +10,7 @@ import com.github.guitsilva.rebelsapi.exceptions.InvalidTradeException;
 import com.github.guitsilva.rebelsapi.exceptions.RebelNotFoundException;
 import com.github.guitsilva.rebelsapi.exceptions.RebelOverwriteException;
 import com.github.guitsilva.rebelsapi.repositories.RebelRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
@@ -23,22 +23,12 @@ import java.util.Objects;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class RebelService {
 
     private final RebelRepository rebelRepository;
     private final MapStructMapper mapStructMapper;
     private final PasswordEncoder passwordEncoder;
-
-    @Autowired
-    public RebelService(
-            RebelRepository rebelRepository,
-            MapStructMapper mapStructMapper,
-            PasswordEncoder passwordEncoder
-    ) {
-        this.rebelRepository = rebelRepository;
-        this.mapStructMapper = mapStructMapper;
-        this.passwordEncoder = passwordEncoder;
-    }
 
     public Page<Rebel> findAll(Pageable pageable) {
         return this.rebelRepository.findAll(pageable);
@@ -81,7 +71,7 @@ public class RebelService {
                 .build();
     }
 
-    public Rebel updateLocationById(Long id, LocationDTO newLocationDTO) {
+    public void updateLocationById(Long id, LocationDTO newLocationDTO) {
         Rebel rebel = this.rebelRepository.findById(id).orElseThrow(
                 () -> new RebelNotFoundException("rebel with id = " + id + " not found")
         );
@@ -92,10 +82,10 @@ public class RebelService {
 
         rebel.setLocation(newLocation);
 
-        return this.rebelRepository.save(rebel);
+        this.rebelRepository.save(rebel);
     }
 
-    public Rebel reportTreasonById(Long id) {
+    public void reportTreasonById(Long id) {
         Rebel rebel = this.rebelRepository.findById(id).orElseThrow(
                 () -> new RebelNotFoundException("rebel with id = " + id + " not found")
         );
@@ -103,7 +93,7 @@ public class RebelService {
         int treasons = rebel.getTreasons();
         rebel.setTreasons(++treasons);
 
-        return this.rebelRepository.save(rebel);
+        this.rebelRepository.save(rebel);
     }
 
     @Transactional
